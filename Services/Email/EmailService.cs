@@ -5,7 +5,7 @@ using System.Net.Mail;
 
 namespace lizi_mail_api.Services.Email
 {
-    public class EmailService
+    public class EmailService : IEmailService
     {
         private readonly IConfiguration _config;
 
@@ -16,6 +16,8 @@ namespace lizi_mail_api.Services.Email
 
         public async Task<Result<bool>> SendEmailAsync(string to, string subject, string body)
         {
+            
+
             try
             {
                 var email = new MimeMessage();

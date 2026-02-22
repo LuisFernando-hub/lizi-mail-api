@@ -2,6 +2,7 @@ using lizi_mail_api.Infra;
 using lizi_mail_api.Infra.Repository.ApiKey;
 using lizi_mail_api.Infra.Repository.User;
 using lizi_mail_api.Services.ApiKey;
+using lizi_mail_api.Services.Email;
 using lizi_mail_api.Services.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 builder.Services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
