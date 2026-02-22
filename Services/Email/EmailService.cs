@@ -14,7 +14,7 @@ namespace lizi_mail_api.Services.Email
             _config = config;
         }
 
-        public async Result<bool> SendEmailAsync(string to, string subject, string body)
+        public async Task<Result<bool>> SendEmailAsync(string to, string subject, string body)
         {
             try
             {
