@@ -13,12 +13,14 @@
             this.data = data;
         }
 
-        private Result(bool status)
+        private Result(bool status, T data, string message)
         {
             this.status = status;
+            this.message = message;
+            this.data = data;
         }
 
-        public static Result<T> success(T data) => new Result<T>(true, null, data);
+        public static Result<T> success(T data, string? message = null) => new Result<T>(true, message, data);
 
         public static Result<T> error(bool status, string message) => new Result<T>(false, message, default);
     }

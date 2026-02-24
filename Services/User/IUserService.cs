@@ -9,5 +9,6 @@ namespace lizi_mail_api.Services.User
     {
         Task<Result<bool>> create(CreateUserRequest request);
         Task<Result<AuthLoginDTO>> login(LoginRequest request);
+        Task<Result<bool>> getByEmail(string email);
     }
 }

@@ -1,53 +1,55 @@
-﻿using lizi_mail_api.Response;
-using MailKit.Security;
-using MimeKit;
-using System.Net.Mail;
+﻿using lizi_mail_api.HttpContext;
+using lizi_mail_api.Request.Email;
+using lizi_mail_api.Response;
+using lizi_mail_api.Services.ApiKey;
+using lizi_mail_api.Services.MimeMassage;
 
 namespace lizi_mail_api.Services.Email
 {
     public class EmailService : IEmailService
     {
         private readonly IConfiguration _config;
+        private readonly IUserContext _userContext;
+        private readonly MimeMessageService _mimeMessageService;
+        private readonly IApiKeyService _apiKeyService;
 
-        public EmailService(IConfiguration config)
+        public EmailService(IConfiguration config, IUserContext userContext, MimeMessageService mimeMessageService, IApiKeyService apiKeyService)
         {
             _config = config;
+            _userContext = userContext;
+            _mimeMessageService = mimeMessageService;
+            _apiKeyService = apiKeyService;
         }
 
-        public async Task<Result<bool>> SendEmailAsync(string to, string subject, string body)
+        public async Task<Result<object>> SendEmailAsync(EmailRequest request)
         {
-            
+
+            var userId = _userContext.UserId;
+
+            var apiKey = await _apiKeyService.getActiveByUserId(userId.ToString()!);
+
+            if (apiKey == null)
+            {
+                return Result<object>.error(false, "API Key not found");
+            }
 
             try
             {
-                var email = new MimeMessage();
-                email.From.Add(MailboxAddress.Parse(_config["Email:From"]));
-                email.To.Add(MailboxAddress.Parse(to));
-                email.Subject = subject;
+                var response = await _mimeMessageService._invoke(_config, request.to, request.subject, request.body);
 
-                email.Body = new TextPart("html") { Text = body };
+                if (!response.status)
+                {
+                   return Result<object>.error(false, $"Failed to send email: {response.message}");
+                }
 
-                using var smtp = new MailKit.Net.Smtp.SmtpClient();
-
-                await smtp.ConnectAsync(
-                    _config["Email:SmtpHost"],
-                    int.Parse(_config["Email:SmtpPort"]),
-                    MailKit.Security.SecureSocketOptions.StartTls
-                );
-
-                await smtp.AuthenticateAsync(
-                    _config["Email:Username"],
-                    _config["Email:Password"]
-                );
-
-                await smtp.SendAsync(email);
-                await smtp.DisconnectAsync(true);
-
-                return Result<bool>.success(true);
+                return Result<object>.success(new {
+                        message = response.message,
+                        status = response.status
+                });
             }
             catch (Exception ex)
             {
-               return Result<bool>.error(false, $"Failed to send email: {ex.Message}");
+               return Result<object>.error(false, $"Failed to send email: {ex.Message}");
             }
         }
     }

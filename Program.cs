@@ -1,8 +1,11 @@
+using lizi_mail_api.HttpContext;
 using lizi_mail_api.Infra;
 using lizi_mail_api.Infra.Repository.ApiKey;
 using lizi_mail_api.Infra.Repository.User;
+using lizi_mail_api.Middleware;
 using lizi_mail_api.Services.ApiKey;
 using lizi_mail_api.Services.Email;
+using lizi_mail_api.Services.MimeMassage;
 using lizi_mail_api.Services.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +26,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 builder.Services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<MimeMessageService>();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserContext, UserContext>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -62,7 +69,13 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/v1/email/send"), appBuilder =>
+{
+    appBuilder.UseMiddleware<ApiKeyMiddleware>();
+});
+
 
 app.MapControllers();
 app.Run();

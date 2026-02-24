@@ -22,9 +22,32 @@ namespace lizi_mail_api.Infra.Repository.ApiKey
             await _context.SaveChangesAsync();
         }
 
-        public async Task<ApiKeyEntity?> getByUserId(string userId)
+        public async Task<ApiKeyEntity?> getActiveByUserId(string userId)
         {
-            return await _context.ApiKey.FirstOrDefaultAsync(a => a.user_id == Guid.Parse(userId));
+            if (!Guid.TryParse(userId, out var userGuid))
+                return null;
+
+            return await _context.ApiKey
+                .Include(a => a.user)
+                .Where(a => a.user_id == userGuid && a.is_active)
+                .Where(a => a.user != null && a.user.is_active) // evita null
+                .FirstOrDefaultAsync();
         }
+
+        public async Task<ApiKeyEntity?> getByUserEmail(string email)
+        {
+            return await _context.ApiKey
+                .Include(a => a.user)
+                .Where(a => a.user != null && a.user.email == email && a.user.is_active)
+                .Where(a => a.is_active)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<ApiKeyEntity?> getByKeyAsync(string apiKey)
+        {
+            return await _context.ApiKey
+                .FirstOrDefaultAsync(a => a.key_hash == apiKey && a.is_active);
+        }
+
     }
 }

@@ -8,6 +8,8 @@ namespace lizi_mail_api.Infra.Repository.ApiKey
 
         Task commitAsync();
 
-        Task<ApiKeyEntity?> getByUserId(string userId);
+        Task<ApiKeyEntity?> getActiveByUserId(string userId);
+        Task<ApiKeyEntity?> getByUserEmail(string email);
+        Task<ApiKeyEntity?> getByKeyAsync(string apiKey);
     }
 }

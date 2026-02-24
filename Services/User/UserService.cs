@@ -80,9 +80,15 @@ namespace lizi_mail_api.Services.User
             string token = CreateToken(user);
 
             //TODO Mapper
-            var responseDto = new AuthLoginDTO(token, user.name, user.email);
-            
+            var apiKey = await _apiKeyService.getActiveByUserId(user.id.ToString());
 
+            if (!apiKey.status)
+            {
+                return Result<AuthLoginDTO>.error(false, "The ApiKey is not found.");
+            }
+
+            var responseDto = new AuthLoginDTO(token, user.name, user.email, apiKey.data.key_hash);
+            
             return Result<AuthLoginDTO>.success(responseDto);
         }
 
@@ -106,6 +112,18 @@ namespace lizi_mail_api.Services.User
             );
 
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+        }
+
+        public async Task<Result<bool>> getByEmail(string email)
+        {
+            var result = await _userRepository.getByEmail(email);
+
+            if (result == null)
+            {
+                return Result<bool>.error(false, "The User not found");
+            }
+
+            return Result<bool>.success(true);
         }
     }
 }
