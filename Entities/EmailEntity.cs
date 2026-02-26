@@ -22,5 +22,18 @@ namespace lizi_mail_api.Entities
         public StatusEmail status { get; set; }
         public DateTime created_at { get; set; }
         public DateTime sent_at { get; set; }
+
+        public EmailEntity(Guid userId, Guid apiKeyId, string toEmail, string subject, string body)
+        {
+            user_id = userId;
+            api_key_id = apiKeyId;
+            to_email = toEmail;
+            this.subject = subject;
+            this.body = body;
+            created_at = DateTime.UtcNow;
+            sent_at = DateTime.UtcNow;
+        }
+
+
     }
 }

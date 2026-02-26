@@ -1,6 +1,7 @@
 using lizi_mail_api.HttpContext;
 using lizi_mail_api.Infra;
 using lizi_mail_api.Infra.Repository.ApiKey;
+using lizi_mail_api.Infra.Repository.Email;
 using lizi_mail_api.Infra.Repository.User;
 using lizi_mail_api.Middleware;
 using lizi_mail_api.Services.ApiKey;
@@ -26,6 +27,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 builder.Services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IEmailRepository, EmailRepository>();
 builder.Services.AddScoped<MimeMessageService>();
 
 builder.Services.AddHttpContextAccessor();

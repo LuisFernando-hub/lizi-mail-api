@@ -1,6 +1,5 @@
 ﻿using lizi_mail_api.DTOs;
 using lizi_mail_api.Entities;
-using lizi_mail_api.Infra.Repository.ApiKey;
 using lizi_mail_api.Infra.Repository.User;
 using lizi_mail_api.Request.Auth;
 using lizi_mail_api.Response;
